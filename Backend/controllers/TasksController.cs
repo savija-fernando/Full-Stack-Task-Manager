@@ -8,11 +8,11 @@ namespace Backend.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 
-public class TaskController : ControllerBase
+public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
 
-    public TaskController(ITaskService taskService)
+    public TasksController(ITaskService taskService)
     {
         _taskService = taskService;
     }
@@ -32,4 +32,44 @@ public class TaskController : ControllerBase
 
         return Ok(task);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateTaskDto dto)
+    {
+        if(string.IsNullOrWhiteSpace(dto.Title))
+            return BadRequest("Title is required");
+        
+        if(dto.Status !="Pending" && dto.Status !="Completed")
+            return BadRequest("Status must be Pending or Completed");
+
+        var createdTask = await _taskService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new{ id=createdTask.Id}, createdTask);
+
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, UpdateTaskDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            return BadRequest("Title is required.");
+
+        if (dto.Status != "Pending" && dto.Status != "Completed")
+            return BadRequest("Status must be Pending or Completed.");
+
+        var updated = await _taskService.UpdateAsync(id, dto);
+        if (!updated) return NotFound();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _taskService.DeleteAsync(id);
+        if (!deleted) return NotFound();
+
+        return NoContent();
+    }
+
+    
 }
