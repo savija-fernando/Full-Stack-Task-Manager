@@ -29,8 +29,7 @@ publish/
 *.ldf
 
 # Secrets (IMPORTANT)
-appsettings.*.json
-appsettings.json
+Backend/appsettings.Development.json
 
 # ========================
 # React / Node (Frontend - future)
